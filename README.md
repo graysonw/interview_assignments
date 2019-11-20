@@ -24,3 +24,10 @@ the "current" date.
 ### Protein Synthesis
 Given a string containing codons, transcribe DNA to mRNA, starting when we see a start codon and ending when we see
 a stop codon. 
+
+## Company4
+Various phone screen problems. 
+- Variant of [Leetcode subdomain visit count](https://leetcode.com/problems/subdomain-visit-count/)
+- We have some clickstream data that we gathered on our client's website. Using cookies, we collected snippets of users' anonymized URL histories while they browsed the site. The histories are in chronological order and no URL was visited more than once per person.
+
+Write a function that takes two users' browsing histories as input and returns the longest contiguous sequence of URLs that appears in both.
