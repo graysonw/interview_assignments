@@ -8,8 +8,8 @@ write a function that will use this data and do some calculation on it. Data wil
 an array of doubles with length M (one entry for each day). The goal of the function is to return the offset in
 array that represents the warmest N successive days.
 
-## Company2 (no time limit)
-### Python script to ingest, compare and output data from REST API and MySQL database
+## Company2
+### Python script to ingest, compare and output data from REST API and MySQL database (no time limit)
 Write a python script that ingests data from one of the external vendor's data sources and combine that data with
 our internal data set. This combined data set should allow data team members to compare the active users of the
 different platforms. The script should finish in less than one hour.
