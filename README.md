@@ -29,3 +29,18 @@ a stop codon.
 Various phone screen problems. 
 - Variant of [Leetcode subdomain visit count](https://leetcode.com/problems/subdomain-visit-count/)
 - We have some clickstream data that we gathered on our client's website. Using cookies, we collected snippets of users' anonymized URL histories while they browsed the site. The histories are in chronological order and no URL was visited more than once per person. Write a function that takes two users' browsing histories as input and returns the longest contiguous sequence of URLs that appears in both.
+
+## Company5
+Write a simple Python web scraper to help us visit the tide pools.
+
+Go to [https://www.tide-forecast.com/](https://www.tide-forecast.com/) to get tide forecasts for these locations:
+
+Half Moon Bay, California
+
+Huntington Beach, California
+
+Providence, Rhode Island
+
+Wrightsville Beach, North Carolina
+
+Load the tide forecast page for each location and extract information on low tides that occur after sunrise and before sunset. Return the time and height for each daylight low tide,.
