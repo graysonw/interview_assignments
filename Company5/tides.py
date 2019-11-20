@@ -1,69 +1,92 @@
-import requests
-import urllib.request
-import time
-from bs4 import BeautifulSoup
+import datetime
 import re
+import requests
+from bs4 import BeautifulSoup
+from dateutil import parser
 
-"""
-args = ["Half Moon Bay, California", 
-        "Huntington Beach, California", 
-        "Providence, Rhode Island",
-        "Wrightsville Beach, North Carolina"]
-"""
 
-args = ["Half Moon Bay, California"]
+def get_data(location: str):
+    initial_url = "https://www.tide-forecast.com"
+    response = requests.post(initial_url + "/locations/catch", data={'query': location})
+    return BeautifulSoup(response.text, "html.parser")
 
-initial_url = "https://www.tide-forecast.com"
 
-for arg in args:
-    response = requests.post(initial_url + "/locations/catch", data={'query': arg})
-    this_soup = BeautifulSoup(response.text, "html.parser")
-    todays_tides = this_soup.findAll('div', {"class": "tide-header__today"})
-    for tide in todays_tides:
-        #print(tide.h3)
-        #print(tide.p)
-        sun_search = re.search('Sunrise is at (.*) and sunset is at (.*)\.', str(tide.p), re.IGNORECASE)
+def print_low_tides(row: str, sunrise_datetime: datetime.date, sunset_datetime: datetime.date):
+    if "Low" in row:
+        tide_time_search = re.findall('([0-9]{1,2}:[0-9]{1,2} ?[ap]m)', str(row), re.IGNORECASE)
+        tide_height_search = re.findall('([0-9]{1,5}.?[0-9]{1,5} ?f[e]{0,2}t).*', str(row), re.IGNORECASE)
+        if sunrise_datetime <= parser.parse(
+                str(datetime.date(sunrise_datetime.year, sunrise_datetime.month, sunrise_datetime.day)) + " " +
+                tide_time_search[0]) <= sunset_datetime:
+            print(tide_time_search[0], "\t", tide_height_search[0])
 
-        if sun_search:
-            sunrise = sun_search.group(1).strip()
-            sunset = sun_search.group(2).strip()
-            print(sunrise, sunset)
-    future_tides = this_soup.findAll('div', {"class": "tide-table"})
-    for tide in future_tides:
-        tide_date = tide.findAll("h4")
-        tide_date_search = re.search('Tide Times for .*\: (.*)</h4>', str(tide_date), re.IGNORECASE)
 
-        if tide_date_search:
-            print(tide_date_search.group(1).strip())
+def calculate_tides(locations: list):
+    sunrise_datetime, sunset_datetime = None, None
 
-        sun_info = tide.findAll("table", {"class":"tide-table__tide-data--sun-moon not_in_print"})[0].findAll("td")
-        #print(sun_info[0].findAll("td"))
-        #if "Sunrise" in str(tide.td):
-        #    print("foo")
-        sunrise = sun_info[0].findAll("span")
-        sunset = sun_info[1].findAll("span")
-        sunrise_search = re.search('<span>(.*)<.*', str(sunrise[0]), re.IGNORECASE)
-        if sunrise_search:
-            print(sunrise_search.group(1).strip())
-        sunset_search = re.search('<span>(.*)<.*', str(sunset[0]), re.IGNORECASE)
-        if sunset_search:
-            print(sunset_search.group(1).strip())
-    #print(tides[0])
-    #print(tides[1])
-    #for tide in tides:
-    #    print(tide)
-    """
-        if 'sunrise' in tide.lower():
-            print(tide)
-        if 'sunset' in tide.lower():
-            print(tide)
-    """
-    #print(tides)
+    for location in locations:
+        if location != locations[0]:
+            print("\n")
+        print(location)
+        print("-" * 30)
 
-#for arg in args:
-#    print([k for k in locations if arg.split(",")[0].replace(" ", "-") in k])
-#    if arg.split(",")[0] in locations:
+        tide_data = get_data(location)
+        todays_tides = tide_data.findAll('div', {"class": "tide-times__table"})
 
-#  location = args.replace(",", "").replace(" ", "-")
-#  url = https://www.tide-forecast.com/locations/Huntington-Beach/tides/latest
+        # Huntington Beach returns nothing if you search for the full string, so only search for "Huntington Beach"
+        if not todays_tides:
+            tide_data = get_data(location.split(",")[0])
+            todays_tides = tide_data.findAll('div', {"class": "tide-times__table"})
+
+        for tide in todays_tides:
+            sun_search = re.search('Sunrise is at (.*) and sunset is at (.*)\.', str(tide.p), re.IGNORECASE)
+
+            if sun_search:
+                sunrise = sun_search.group(1).strip()
+                sunset = sun_search.group(2).strip()
+                print(datetime.date.today().strftime("%A %d %B %Y"))
+                sunrise_datetime = parser.parse(str(datetime.date.today()) + " " + sunrise)
+                sunset_datetime = parser.parse(str(datetime.date.today()) + " " + sunset)
+
+            for row in tide.findAll("tr"):
+                print_low_tides(str(row), sunrise_datetime, sunset_datetime)
+
+        future_tides = tide_data.findAll('div', {"class": "tide-table"})
+        for tide in future_tides:
+            print("")
+            tide_date = tide.findAll("h4")
+            tide_date_search = re.search('Tide Times for .*\: (.*)</h4>', str(tide_date), re.IGNORECASE)
+
+            tide_date = None
+            if tide_date_search:
+                tide_date = tide_date_search.group(1).strip()
+
+            print(tide_date)
+            sun_info = tide.findAll("table", {"class": "tide-table__tide-data--sun-moon not_in_print"})[0].findAll("td")
+            sunrise = sun_info[0].findAll("span")
+            sunset = sun_info[1].findAll("span")
+
+            try:
+                sunrise_search = re.search('<span>(.*)<.*', str(sunrise[0]), re.IGNORECASE)
+                if sunrise_search:
+                    sunrise_datetime = parser.parse(tide_date + " " + sunrise_search.group(1).strip())
+                sunset_search = re.search('<span>(.*)<.*', str(sunset[0]), re.IGNORECASE)
+                if sunset_search:
+                    sunset_datetime = parser.parse(tide_date + " " + sunset_search.group(1).strip())
+            # Some dates don't have sunset data. Skip.
+            except IndexError:
+                print(f"Could not get sunrise/sunset data for {tide_date}. Skipping...")
+                continue
+
+            for row in [tide.findAll("tr")]:
+                for item in row:
+                    print_low_tides(str(item), sunrise_datetime, sunset_datetime)
+
+
+if __name__ == "__main__":
+    locations = ["Half Moon Bay, California",
+                 "Huntington Beach, California",
+                 "Providence, Rhode Island",
+                 "Wrightsville Beach, North Carolina"]
+    calculate_tides(locations)
 
