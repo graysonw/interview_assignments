@@ -4,13 +4,15 @@ import requests
 from bs4 import BeautifulSoup
 from dateutil import parser
 
-
+# Use this to get the tide data from a location by using the search form on the home page.
 def get_data(location: str):
     initial_url = "https://www.tide-forecast.com"
     response = requests.post(initial_url + "/locations/catch", data={'query': location})
     return BeautifulSoup(response.text, "html.parser")
 
 
+# For each table row, look for a low tide, find the height and time, and see if it's during daylight hours.
+# If so, print.
 def print_low_tides(row: str, sunrise_datetime: datetime.date, sunset_datetime: datetime.date):
     if "Low" in row:
         tide_time_search = re.findall('([0-9]{1,2}:[0-9]{1,2} ?[ap]m)', str(row), re.IGNORECASE)
@@ -25,6 +27,7 @@ def calculate_tides(locations: list):
     sunrise_datetime, sunset_datetime = None, None
 
     for location in locations:
+        # If not the first location, print an extra blank line
         if location != locations[0]:
             print("\n")
         print(location)
@@ -38,6 +41,7 @@ def calculate_tides(locations: list):
             tide_data = get_data(location.split(",")[0])
             todays_tides = tide_data.findAll('div', {"class": "tide-times__table"})
 
+        # The table format is different for today's tide information vs future ones.
         for tide in todays_tides:
             sun_search = re.search('Sunrise is at (.*) and sunset is at (.*)\.', str(tide.p), re.IGNORECASE)
 
