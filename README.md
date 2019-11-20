@@ -21,17 +21,18 @@ do the matching would be acceptable. Reading in 100% of either source prior to m
 Pretend that the current date is 2017-02-02. There are references in the assignment that will confirm that as
 the "current" date.
 
-## Company3 (1-hour time limit)
-### Protein Synthesis
+## Company3
+### Protein Synthesis (1-hour time limit)
 Given a string containing codons, transcribe DNA to mRNA, starting when we see a start codon and ending when we see
 a stop codon. 
 
-## Company4 (45-minute time limit)
-Various phone screen problems. 
+## Company4
+### Various phone screen problems (45-minute time limit)
 - Variant of [Leetcode subdomain visit count](https://leetcode.com/problems/subdomain-visit-count/)
 - We have some clickstream data that we gathered on our client's website. Using cookies, we collected snippets of users' anonymized URL histories while they browsed the site. The histories are in chronological order and no URL was visited more than once per person. Write a function that takes two users' browsing histories as input and returns the longest contiguous sequence of URLs that appears in both.
 
-## Company5 (2-hour time limit)
+## Company5 
+### Tide pool web scraper (2-hour time limit)
 Write a simple Python web scraper to help us visit the tide pools.
 
 Go to [https://www.tide-forecast.com/](https://www.tide-forecast.com/) to get tide forecasts for these locations:
