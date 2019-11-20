@@ -1,0 +1,10 @@
+certifi==2019.9.11
+chardet==3.0.4
+idna==2.8
+mysql-connector-python==8.0.18
+protobuf==3.10.0
+python-dateutil==2.8.1
+requests==2.22.0
+six==1.12.0
+tenacity==5.1.5
+urllib3==1.25.6
